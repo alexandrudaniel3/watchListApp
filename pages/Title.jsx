@@ -1,64 +1,153 @@
-import { View, Text, Image, StyleSheet } from "react-native";
+import { View, Text, Image, StyleSheet, Pressable, ActivityIndicator } from "react-native";
 import { useEffect, useState } from "react";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const getTitleData = async (titleID, setTitleData, setLoading) => {
-
   try {
-    const response = await fetch("https://www.omdbapi.com/?apikey=" + process.env["REACT_APP_API_KEY"] + "&i=" + titleID);
+    const response = await fetch("https://www.omdbapi.com/?apikey=7f2f41c3&i=" + titleID);
     const data = await response.json();
     setTitleData(data);
-    console.log(data);
     setLoading(false);
   } catch (e) {
     console.log(e);
   }
-}
+};
 
-export default function Title ({route}) {
+const getWatchedStatus = async (titleID, setInWatchList, setWatched) => {
+  const isInWatchList = await AsyncStorage.getItem(titleID);
+  console.log(isInWatchList);
+  if (!isInWatchList) {
+    console.log('abc');
+    return;
+  } else {
+    setInWatchList(true);
+    const storedData = JSON.parse(isInWatchList);
+    if (storedData.watched === true) {
+      setWatched(true);
+    }
+  }
+};
+
+const addToWatchList = async (titleID, setInWatchList) => {
+  await AsyncStorage.setItem(titleID, JSON.stringify({ watched: false }));
+  setInWatchList(true);
+};
+
+const removeFromWatchList = async (titleID, setInWatchList, setWatched) => {
+  await AsyncStorage.removeItem(titleID);
+  setInWatchList(false);
+  setWatched(false);
+};
+
+const setWatchStatus = async (titleID, setWatched, status) => {
+  await AsyncStorage.setItem(titleID, JSON.stringify({ watched: true }));
+  setWatched(status);
+};
+
+
+export default function Title({ route }) {
 
   const { titleID } = route.params;
   const [titleData, setTitleData] = useState({});
-  const [watchData, setWatchData] = useState({});
+  const [inWatchList, setInWatchList] = useState(false);
+  const [watched, setWatched] = useState(false);
   const [loading, setLoading] = useState(true);
 
 
-
   useEffect(() => {
-    console.log(process.env.REACT_APP_API_KEY);
     getTitleData(titleID, setTitleData, setLoading);
-    console.log(titleData);
+    getWatchedStatus(titleID, setInWatchList, setWatched);
   }, []);
 
+  const WatchListButtons = () => {
+    if (inWatchList) {
+      if (watched) {
+        return (
+          <View style={styles.watchListButtonsContainer}>
+            <Pressable style={styles.watchListButton}
+                       onPress={() => setWatchStatus(titleID, setWatched, false)}>
+              <Text style={styles.watchListButtonText}>Unmark As Watched</Text>
+            </Pressable>
+            <Pressable style={styles.removeWatchListButton}
+                       onPress={() => removeFromWatchList(titleID, setInWatchList, setWatched)}>
+              <Text style={styles.removeWatchListButtonText}>Remove From WatchList</Text>
+            </Pressable>
+          </View>
+        );
+      } else {
+        return (
+          <View style={styles.watchListButtonsContainer}>
+            <Pressable style={styles.watchListButton}
+                       onPress={() => setWatchStatus(titleID, setWatched, true)}>
+              <Text style={styles.watchListButtonText}>Mark As Watched</Text>
+            </Pressable>
+            <Pressable style={styles.removeWatchListButton}
+                       onPress={() => removeFromWatchList(titleID, setInWatchList, setWatched)}>
+              <Text style={styles.removeWatchListButtonText}>Remove From WatchList</Text>
+            </Pressable>
+          </View>
+        );
+      }
+    }
 
-
-  return (
-    <View style={styles.page}>
-      {loading ? <Text>Loading...</Text> : null}
-      <Text style={styles.title}>{titleData.Title}</Text>
-      <View style={styles.imageContainer}>
-        <Image style={styles.image} source={{uri: titleData.Poster}}/>
+    return (
+      <View>
+        <Pressable style={styles.watchListButton}
+                   onPress={() => addToWatchList(titleID, setInWatchList)}
+        >
+          <Text style={styles.watchListButtonText}>Add to Watch List</Text>
+        </Pressable>
       </View>
-        <Text style={styles.yearAndGenre}>{titleData.Released}  {titleData.Genre}</Text>
+    );
+  };
 
-      <Text style={styles.plot}>{titleData.Plot}</Text>
-    </View>
-  )
+  const displayLoading = () => {
+    return (
+      <View style={styles.page}>
+        <ActivityIndicator animating={loading} size="large" color="#6c6f75" style={{ margin: 50 }} />
+      </View>
+    );
+  };
+
+  const displayData = () => {
+    return (
+      <View style={styles.page}>
+        <Text style={styles.title}>{titleData.Title?.toUpperCase()}</Text>
+        <View style={styles.imageContainer}>
+          <Image style={styles.image} source={{ uri: titleData.Poster }} />
+        </View>
+        <Text style={styles.yearAndGenre}>{titleData.Released} {titleData.Genre}</Text>
+        <Text style={styles.plot}>{titleData.Plot}</Text>
+        <WatchListButtons />
+      </View>
+    );
+  };
+  return loading ? displayLoading() : displayData();
 }
 
 const styles = StyleSheet.create({
   page: {
+    flex: 1,
     paddingHorizontal: "5%",
+    backgroundColor: "#2b2d30",
   },
   title: {
-    alignSelf:"center",
+    alignSelf: "center",
     fontWeight: "bold",
     fontSize: 40,
+    color: "white",
+    fontFamily: "BebasNeue-Regular",
+    margin: 5,
+    textShadowColor: "rgba(0, 0, 0, 1)",
+    textShadowOffset: { width: 4, height: 4 },
+    textShadowRadius: 0,
+    textAlign: "center",
   },
   imageContainer: {
     height: 280,
     width: "70%",
     margin: "auto",
-    alignSelf: "center"
+    alignSelf: "center",
   },
   image: {
     resizeMode: "cover",
@@ -67,11 +156,39 @@ const styles = StyleSheet.create({
   yearAndGenre: {
     alignSelf: "center",
     width: "90%",
-    textAlign: "center"
+    textAlign: "center",
+    color: "white",
   },
   plot: {
     alignSelf: "center",
     width: "90%",
-    textAlign: "center"
+    textAlign: "center",
+    color: "white",
   },
-})
+  watchListButtonsContainer: {
+    marginVertical: 5,
+  },
+  watchListButton: {
+    backgroundColor: "#B11515",
+    alignSelf: "center",
+    padding: 10,
+    borderRadius: 25,
+    marginVertical: 5,
+  },
+  watchListButtonText: {
+    color: "white",
+    fontWeight: "bold",
+  },
+  removeWatchListButton: {
+    backgroundColor: "#1f2023",
+    alignSelf: "center",
+    padding: 10,
+    borderRadius: 25,
+    marginVertical: 5,
+  },
+  removeWatchListButtonText: {
+    color: "white",
+    fontWeight: "bold",
+    fontSize: 10,
+  },
+});

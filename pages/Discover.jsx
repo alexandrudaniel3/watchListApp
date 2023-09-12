@@ -19,9 +19,9 @@ const SearchBar = ({ searchQuery, setSearchQuery }) => {
         value={searchQuery}
         placeholderTextColor="black"
         inputStyle={{ color: "black" }}
-        // icon={require('../assets/search-icon-64px.png')}
-        // iconColor={"black"}
-        // clearIcon={require('../assets/clear-icon-64px.png')}
+        icon={require('../assets/search-icon-64px.png')}
+        iconColor={"black"}
+        clearIcon={require('../assets/clear-icon-64px.png')}
       />
     </View>
   );
@@ -39,7 +39,7 @@ export default function Discover({navigation}) {
     }
 
     setLoading(true);
-    const results = await fetch("https://www.omdbapi.com/?apikey=" + process.env["REACT_APP_API_KEY"] + "&s=" + searchQuery.trim())
+    const results = await fetch("https://www.omdbapi.com/?apikey=7f2f41c3&s=" + searchQuery.trim())
       .then(response => response.json())
       .then(data => data.Search);
     setLoading(false);
@@ -58,7 +58,7 @@ export default function Discover({navigation}) {
 
 
   return (
-    <View style={{ flex: 1 }}>
+    <View style={styles.page}>
       <SearchBar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
       <ScrollView keyboardShouldPersistTaps="handled">
         {searchedTitles.length !== 0 ?
@@ -71,8 +71,13 @@ export default function Discover({navigation}) {
 }
 
 const styles = StyleSheet.create({
+  page: {
+    flex: 1,
+    backgroundColor: "#2b2d30",
+  },
   searchBar: {
     height: 60,
+    marginVertical: 20,
   },
   searchBarInput: {
     borderStyle: "solid",
