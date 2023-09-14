@@ -7,7 +7,6 @@ const SearchBar = ({ searchQuery, setSearchQuery }) => {
 
   const onChangeSearch = query => {
     setSearchQuery(query);
-    console.log(query);
   };
 
   return (
@@ -42,14 +41,16 @@ export default function Discover({navigation}) {
     const results = await fetch("https://www.omdbapi.com/?apikey=7f2f41c3&s=" + searchQuery.trim())
       .then(response => response.json())
       .then(data => data.Search);
+
+    const filteredResults = results?.filter(element => element.Type !== 'game');
     setLoading(false);
 
-    if (!results) {
+    if (!filteredResults) {
       setSearchedTitles([]);
       return;
     }
 
-    setSearchedTitles(results);
+    setSearchedTitles(filteredResults);
   };
 
   useEffect(() => {

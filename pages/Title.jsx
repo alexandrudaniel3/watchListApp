@@ -1,6 +1,7 @@
 import { View, Text, Image, StyleSheet, Pressable, ActivityIndicator } from "react-native";
 import { useEffect, useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useIsFocused } from "@react-navigation/native";
 
 const getTitleData = async (titleID, setTitleData, setLoading) => {
   try {
@@ -9,15 +10,12 @@ const getTitleData = async (titleID, setTitleData, setLoading) => {
     setTitleData(data);
     setLoading(false);
   } catch (e) {
-    console.log(e);
   }
 };
 
 const getWatchedStatus = async (titleID, setInWatchList, setWatched) => {
   const isInWatchList = await AsyncStorage.getItem(titleID);
-  console.log(isInWatchList);
   if (!isInWatchList) {
-    console.log('abc');
     return;
   } else {
     setInWatchList(true);
@@ -28,8 +26,12 @@ const getWatchedStatus = async (titleID, setInWatchList, setWatched) => {
   }
 };
 
-const addToWatchList = async (titleID, setInWatchList) => {
-  await AsyncStorage.setItem(titleID, JSON.stringify({ watched: false }));
+const addToWatchList = async (titleID, titleData, setInWatchList) => {
+  await AsyncStorage.setItem(titleID, JSON.stringify({
+    watched: false,
+    title: titleData.Title,
+    imageSource: titleData.Poster
+  }));
   setInWatchList(true);
 };
 
@@ -39,8 +41,13 @@ const removeFromWatchList = async (titleID, setInWatchList, setWatched) => {
   setWatched(false);
 };
 
-const setWatchStatus = async (titleID, setWatched, status) => {
-  await AsyncStorage.setItem(titleID, JSON.stringify({ watched: true }));
+const setWatchStatus = async (titleID, setWatched, titleData, status) => {
+  await AsyncStorage.setItem(titleID, JSON.stringify({
+    watched: status,
+    title: titleData.Title,
+    imageSource: titleData.Poster
+    }
+  ));
   setWatched(status);
 };
 
@@ -52,12 +59,16 @@ export default function Title({ route }) {
   const [inWatchList, setInWatchList] = useState(false);
   const [watched, setWatched] = useState(false);
   const [loading, setLoading] = useState(true);
-
+  const isFocused = useIsFocused();
 
   useEffect(() => {
     getTitleData(titleID, setTitleData, setLoading);
     getWatchedStatus(titleID, setInWatchList, setWatched);
   }, []);
+
+  useEffect(() => {
+    getWatchedStatus(titleID, setInWatchList, setWatched);
+  }, [isFocused]);
 
   const WatchListButtons = () => {
     if (inWatchList) {
@@ -65,7 +76,7 @@ export default function Title({ route }) {
         return (
           <View style={styles.watchListButtonsContainer}>
             <Pressable style={styles.watchListButton}
-                       onPress={() => setWatchStatus(titleID, setWatched, false)}>
+                       onPress={() => setWatchStatus(titleID, setWatched, titleData, false)}>
               <Text style={styles.watchListButtonText}>Unmark As Watched</Text>
             </Pressable>
             <Pressable style={styles.removeWatchListButton}
@@ -78,7 +89,7 @@ export default function Title({ route }) {
         return (
           <View style={styles.watchListButtonsContainer}>
             <Pressable style={styles.watchListButton}
-                       onPress={() => setWatchStatus(titleID, setWatched, true)}>
+                       onPress={() => setWatchStatus(titleID, setWatched, titleData, true)}>
               <Text style={styles.watchListButtonText}>Mark As Watched</Text>
             </Pressable>
             <Pressable style={styles.removeWatchListButton}
@@ -93,7 +104,7 @@ export default function Title({ route }) {
     return (
       <View>
         <Pressable style={styles.watchListButton}
-                   onPress={() => addToWatchList(titleID, setInWatchList)}
+                   onPress={() => addToWatchList(titleID, titleData, setInWatchList)}
         >
           <Text style={styles.watchListButtonText}>Add to Watch List</Text>
         </Pressable>
