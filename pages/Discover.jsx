@@ -1,32 +1,38 @@
-import { View, StyleSheet, Text, ScrollView } from "react-native";
+import { View, StyleSheet, Text, ScrollView, Pressable, Image, TextInput } from "react-native";
 import { Searchbar } from "react-native-paper";
 import { useEffect, useState } from "react";
 import TitlePreview from "../components/TitlePreview";
 
-const SearchBar = ({ searchQuery, setSearchQuery }) => {
-
+const SearchBar = ({ setSearchQuery }) => {
+  const [input, setInput] = useState("");
   const onChangeSearch = query => {
-    setSearchQuery(query);
+    setInput(query);
+  };
+
+  const onSearchButtonPress = () => {
+    setSearchQuery(input);
   };
 
   return (
     <View style={styles.searchBar}>
-      <Searchbar
-        style={styles.searchBarInput}
-        placeholder="Search Here"
-        onChangeText={onChangeSearch}
-        value={searchQuery}
-        placeholderTextColor="black"
-        inputStyle={{ color: "black" }}
-        icon={require('../assets/search-icon-64px.png')}
-        iconColor={"black"}
-        clearIcon={require('../assets/clear-icon-64px.png')}
+      <TextInput style={styles.searchBarInput}
+                 placeholder="Search Here"
+                 onChangeText={onChangeSearch}
+                 value={input}
+                 placeholderTextColor="#2b2d30"
       />
+      <Pressable
+        onPress={onSearchButtonPress}>
+        <Image
+          style={styles.searchBarButton}
+          source={require("../assets/search-icon-64px.png")}
+        />
+      </Pressable>
     </View>
   );
 };
 
-export default function Discover({navigation}) {
+export default function Discover({ navigation }) {
   const [searchQuery, setSearchQuery] = useState("");
   const [searchedTitles, setSearchedTitles] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -42,7 +48,7 @@ export default function Discover({navigation}) {
       .then(response => response.json())
       .then(data => data.Search);
 
-    const filteredResults = results?.filter(element => element.Type !== 'game');
+    const filteredResults = results?.filter(element => element.Type !== "game");
     setLoading(false);
 
     if (!filteredResults) {
@@ -57,15 +63,40 @@ export default function Discover({navigation}) {
     searchTitles();
   }, [searchQuery]);
 
+  const SearchNow = () => {
+    return (
+      <View style={{ flex: 1, justifySelf: "center", alignSelf: "center" }}>
+        <Image
+          style={{ width: 128, height: 119.5, alignSelf: "center", marginTop: 20, tintColor: "#6c6f75" }}
+          source={require("../assets/television-icon.png")}
+        />
+        <Text
+          style={{ textAlign: "center", fontWeight: "bold", color: "#6c6f75", fontSize: 20, margin: 20 }}
+        >Enter a keyword to search for TV series and Movies.</Text>
+      </View>
+    );
+  };
+
+  const NoTitlesFound = () => {
+    return (
+      <View>
+        <Text
+          style={{ textAlign: "center", fontWeight: "bold", color: "#6c6f75", fontSize: 20, margin: 20 }}
+        >
+          No matching TV series or Movies with keyword "{searchQuery?.trim()}".
+        </Text>
+      </View>
+    );
+  };
 
   return (
     <View style={styles.page}>
-      <SearchBar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
+      <SearchBar setSearchQuery={setSearchQuery} />
       <ScrollView keyboardShouldPersistTaps="handled">
         {searchedTitles.length !== 0 ?
           searchedTitles.map((title, index) => (
-            <TitlePreview data={title} key={index} navigation={navigation}/>
-          )) : searchQuery.trim() === "" ? <Text>Search now :)</Text> : loading ? null : <Text>No titles found.</Text>}
+            <TitlePreview data={title} key={index} navigation={navigation} />
+          )) : searchQuery.trim() === "" ? <SearchNow /> : loading ? null : <NoTitlesFound />}
       </ScrollView>
     </View>
   );
@@ -79,10 +110,20 @@ const styles = StyleSheet.create({
   searchBar: {
     height: 60,
     marginVertical: 20,
+    flexDirection: "row",
   },
   searchBarInput: {
-    borderStyle: "solid",
-    borderWidth: 3,
-    borderColor: "black",
+    flex: 1,
+    margin: 5,
+    backgroundColor: "#6c6f75",
+    borderRadius: 25,
+    paddingHorizontal: 10,
+  },
+  searchBarButton: {
+    width: 40,
+    height: 40,
+    margin: 10,
+    marginLeft: 0,
+    tintColor: "#6c6f75",
   },
 });
