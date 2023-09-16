@@ -1,11 +1,12 @@
-import { View, Text, Image, StyleSheet, Pressable, ActivityIndicator } from "react-native";
+import { View, Text, Image, StyleSheet, Pressable, ActivityIndicator, Linking, ScrollView, Share } from "react-native";
 import { useEffect, useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useIsFocused } from "@react-navigation/native";
+import StarRating, { StarRatingDisplay } from "react-native-star-rating-widget";
 
 const getTitleData = async (titleID, setTitleData, setLoading) => {
   try {
-    const response = await fetch("https://www.omdbapi.com/?apikey=7f2f41c3&i=" + titleID);
+    const response = await fetch("https://www.omdbapi.com/?apikey=7f2f41c3&i=" + titleID + "&plot=full");
     const data = await response.json();
     setTitleData(data);
     setLoading(false);
@@ -16,6 +17,7 @@ const getTitleData = async (titleID, setTitleData, setLoading) => {
 const getWatchedStatus = async (titleID, setInWatchList, setWatched) => {
   const isInWatchList = await AsyncStorage.getItem(titleID);
   if (!isInWatchList) {
+    setInWatchList(false);
     return;
   } else {
     setInWatchList(true);
@@ -30,7 +32,7 @@ const addToWatchList = async (titleID, titleData, setInWatchList) => {
   await AsyncStorage.setItem(titleID, JSON.stringify({
     watched: false,
     title: titleData.Title,
-    imageSource: titleData.Poster
+    imageSource: titleData.Poster,
   }));
   setInWatchList(true);
 };
@@ -43,10 +45,10 @@ const removeFromWatchList = async (titleID, setInWatchList, setWatched) => {
 
 const setWatchStatus = async (titleID, setWatched, titleData, status) => {
   await AsyncStorage.setItem(titleID, JSON.stringify({
-    watched: status,
-    title: titleData.Title,
-    imageSource: titleData.Poster
-    }
+      watched: status,
+      title: titleData.Title,
+      imageSource: titleData.Poster,
+    },
   ));
   setWatched(status);
 };
@@ -120,19 +122,75 @@ export default function Title({ route }) {
     );
   };
 
+  const TrailerButton = () => {
+    return (
+        <Pressable style={styles.trailersButton}
+          title="open Youtube" onPress={() => {
+          Linking.openURL(`https://www.youtube.com/results?search_query=${titleID}+trailers`)
+        }} color="darkred">
+          <Text style={styles.trailersButtonText}>Watch Trailers</Text>
+          <Image
+            style={{ width: 18, height: 18, alignSelf: "center", tintColor: "white" }}
+            source={require("../assets/play-icon.png")}
+          />
+        </Pressable>
+    )
+  }
+
+  const Rating = () => {
+    if (!titleData.Ratings) {
+      return;
+    }
+
+    const ratingSource = titleData?.Ratings[0].Source;
+    const rating = titleData?.Ratings[0].Value.split("/");
+
+    return (
+      <StarRatingDisplay
+        rating={Number(rating[0]) / 2}
+        maxStars={Number(rating[1]) / 2}
+        style={{ alignSelf: "center" }}
+      />
+    );
+  };
+
+  const ShareButton = () => {
+
+    return (
+      <Pressable style={styles.trailersButton}
+        onPress={async () => {
+        await Share.share({
+          message: `Check out this ${titleData.Type} called '${titleData.Title}' I found on WatchListApp! https://www.imdb.com/title/${titleID}/`,
+        })
+      }}>
+        <Text style={styles.trailersButtonText}>Share With Friends</Text>
+        <Image
+          style={{ width: 18, height: 18, alignSelf: "center", tintColor: "white" }}
+          source={require("../assets/share-icon.png")}
+        />
+      </Pressable>
+    )
+  }
+
   const displayData = () => {
     return (
-      <View style={styles.page}>
+      <ScrollView style={styles.page}>
         <Text style={styles.title}>{titleData.Title?.toUpperCase()}</Text>
         <View style={styles.imageContainer}>
           <Image style={styles.image} source={{ uri: titleData.Poster }} />
         </View>
-        <Text style={styles.yearAndGenre}>{titleData.Released} {titleData.Genre}</Text>
-        <Text style={styles.plot}>{titleData.Plot}</Text>
+        <Text style={styles.yearAndGenre}>{titleData.Released} – {titleData.Genre}</Text>
+        <Rating />
         <WatchListButtons />
-      </View>
+        <Text style={styles.plot}>{titleData.Plot}</Text>
+        <View style={{flexDirection: "row", alignSelf: "center"}}>
+          <TrailerButton />
+          <ShareButton />
+        </View>
+      </ScrollView>
     );
   };
+
   return loading ? displayLoading() : displayData();
 }
 
@@ -163,12 +221,14 @@ const styles = StyleSheet.create({
   image: {
     resizeMode: "cover",
     height: 280,
+    borderRadius: 15,
   },
   yearAndGenre: {
     alignSelf: "center",
     width: "90%",
     textAlign: "center",
     color: "white",
+    marginVertical: 10,
   },
   plot: {
     alignSelf: "center",
@@ -202,4 +262,20 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     fontSize: 10,
   },
+  trailersButton: {
+    flexDirection: "row",
+    backgroundColor: "#1f2023",
+    alignSelf: "center",
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 10,
+    borderRadius: 25,
+    margin: 5,
+  },
+  trailersButtonText: {
+    color: "white",
+    fontWeight: "bold",
+    fontSize: 10,
+    marginRight: 5
+  }
 });
