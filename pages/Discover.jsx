@@ -25,7 +25,7 @@ const SearchBar = ({ setSearchQuery }) => {
         onPress={onSearchButtonPress}>
         <Image
           style={styles.searchBarButton}
-          source={require("../assets/search-icon-64px.png")}
+          source={require("../assets/search_icon.png")}
         />
       </Pressable>
     </View>
@@ -68,7 +68,7 @@ export default function Discover({ navigation }) {
       <View style={{ flex: 1, justifySelf: "center", alignSelf: "center" }}>
         <Image
           style={{ width: 128, height: 119.5, alignSelf: "center", marginTop: 20, tintColor: "#6c6f75" }}
-          source={require("../assets/television-icon.png")}
+          source={require("../assets/television_icon.png")}
         />
         <Text
           style={{ textAlign: "center", fontWeight: "bold", color: "#6c6f75", fontSize: 20, margin: 20 }}

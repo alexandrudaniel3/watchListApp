@@ -1,9 +1,10 @@
-import { View, StyleSheet, Text, ScrollView } from "react-native";
+import { View, StyleSheet, Text, ScrollView, Pressable, Image } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useEffect, useState } from "react";
 import TitlePreview from "../components/TitlePreview";
 import SavedTitle from "../components/SavedTitle";
 import { useIsFocused } from "@react-navigation/native";
+import { SimpleGrid } from "react-native-super-grid";
 
 const getStoredTitles = async (setTitlesData) => {
   let titlesIDs = [];
@@ -24,7 +25,7 @@ const getStoredTitles = async (setTitlesData) => {
   } catch (e) {
 
   }
-}
+};
 
 const clearAllData = async () => {
   let keys = [];
@@ -38,17 +39,16 @@ const clearAllData = async () => {
     await AsyncStorage.multiRemove(keys);
     console.log("removed");
   }
-}
+};
 
 
-export default function WatchList({navigation}) {
+export default function WatchList({ navigation }) {
   const [titlesData, setTitlesData] = useState([]);
+  const [displayMode, setDisplayMode] = useState("list");
   const isFocused = useIsFocused();
 
   useEffect(() => {
     getStoredTitles(setTitlesData);
-    // console.log(titlesData);
-    // clearAllData();
   }, []);
 
   useEffect(() => {
@@ -67,15 +67,26 @@ export default function WatchList({navigation}) {
       return;
     }
 
+    if (displayMode === 'list') {
+      return (
+        <View>
+          <Text style={styles.categoryTitle}>Need To Watch:</Text>
+          {toWatchList.map((title, index) => (
+            <SavedTitle data={title.data} id={title.id} key={index} navigation={navigation} displayMode={displayMode}/>
+          ))}
+        </View>
+      )
+    }
+
     return (
       <View>
         <Text style={styles.categoryTitle}>Need To Watch:</Text>
-        {toWatchList.map((title, index) => (
-          <SavedTitle data={title.data} id={title.id} key={index} navigation={navigation} />
-        ))}
+        <SimpleGrid data={toWatchList}
+                    itemDimension={110}
+                    renderItem={({ item }) => (<SavedTitle data={item.data} id={item.id} navigation={navigation} displayMode={displayMode}/>)} />
       </View>
-    )
-  }
+    );
+  };
 
   const WatchedList = () => {
     if (titlesData.length === 0) {
@@ -88,29 +99,53 @@ export default function WatchList({navigation}) {
       return;
     }
 
+    if (displayMode === 'list') {
+      return (
+        <View>
+          <Text style={styles.categoryTitle}> Watched: </Text>
+          {watchedList.map((title, index) => (
+            <SavedTitle data={title.data} id={title.id} key={index} navigation={navigation} displayMode={displayMode}/>
+          ))}
+        </View>
+      );
+    }
     return (
       <View>
-        <Text style={styles.categoryTitle}>
-          Watched:
-        </Text>
-        {watchedList.map((title, index) => (
-          <SavedTitle data={title.data} id={title.id} key={index} navigation={navigation} />
-        ))}
+        <Text style={styles.categoryTitle}>Watched: </Text>
+        <SimpleGrid data={watchedList}
+                    itemDimension={110}
+                    renderItem={({ item }) => (<SavedTitle data={item.data} id={item.id} navigation={navigation} displayMode={displayMode}/>)} />
       </View>
-    )
-  }
+    );
+  };
 
   return (
     <View style={styles.page}>
-      <Text style={styles.header}>
-        Watch List
-      </Text>
+      <View style={styles.header}>
+        <Text style={styles.headerText}>
+          Watch List
+        </Text>
+        <Pressable
+          style={styles.displayButton}
+          onPress={() => {
+            if (displayMode === "list") {
+              setDisplayMode("grid");
+            } else {
+              setDisplayMode("list");
+            }
+          }}
+        >
+          {displayMode === "list" ? <Image style={styles.displayButtonImage} source={require("../assets/grid_icon.png")}
+                                           alt={"displayGrid"} /> :
+            <Image style={styles.displayButtonImage} source={require("../assets/list_icon.png")} alt={"displayGrid"} />}
+        </Pressable>
+      </View>
       <ScrollView>
         <ToWatchList />
         <WatchedList />
       </ScrollView>
     </View>
-  )
+  );
 }
 
 const styles = StyleSheet.create({
@@ -119,22 +154,43 @@ const styles = StyleSheet.create({
     backgroundColor: "#2b2d30",
   },
   header: {
-    alignSelf: "center",
+    flexDirection: "row",
+    marginHorizontal: 20,
+    margin: 5,
+    height: 60,
+  },
+  headerText: {
+    flex: 1,
+    alignSelf: "flex-start",
     fontWeight: "bold",
-    fontSize: 50,
+    fontSize: 55,
     color: "white",
     fontFamily: "BebasNeue-Regular",
-    margin: 5,
     textShadowColor: "rgba(0, 0, 0, 1)",
     textShadowOffset: { width: 4, height: 4 },
     textShadowRadius: 0,
-    textAlign: "center",
+    textAlign: "left",
+  },
+  displayButton: {
+    margin: 5,
+    height: 50,
+    width: 50,
+    justifyContent: "center",
+    alignContent: "center",
+    backgroundColor: "#6c6f75",
+    borderRadius: 50,
+  },
+  displayButtonImage: {
+    width: 30,
+    height: 30,
+    alignSelf: "center",
+    tintColor: "#2b2d30",
   },
   categoryTitle: {
-    fontFamily: "BebasNeue-Regular",
+    fontFamily: "Lato-Bold",
     fontSize: 25,
     color: "white",
     marginLeft: 20,
     marginVertical: 5,
-  }
-})
+  },
+});

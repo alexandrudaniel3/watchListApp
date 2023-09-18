@@ -13,8 +13,8 @@ export default function TitlePreview({ data, navigation }) {
         {data.Poster !== 'N/A' ? <Image source={{ uri: data.Poster }} style={{ height: 80, width: 70 }} /> : <Text>No image</Text>}
       </View>
       <View style={{ flex: 3}}>
-        <Text style={styles.previewText}>{data.Title}, {data.Year}</Text>
-        <Text style={styles.previewText}>{data.Type}</Text>
+        <Text style={styles.previewText}>{data.Title}</Text>
+        <Text style={styles.previewTextType}>{data.Type}, {data.Year}</Text>
       </View>
     </Pressable>
   );
@@ -31,10 +31,18 @@ const styles = StyleSheet.create({
     borderRadius: 15,
     shadowColor: "#111213FF",
     shadowOffset: {width: 5, height:5},
-    shadowOpacity: 1,
-    shadowRadius: 0,
+    shadowOpacity: 0.75,
+    shadowRadius: 3,
+    alignItems: "center",
   },
   previewText: {
     color: "white",
+    fontFamily: "Lato-Bold",
+    fontSize: 18,
   },
+  previewTextType: {
+    color: "white",
+    fontFamily: "Lato-Regular",
+    fontSize: 15,
+  }
 })

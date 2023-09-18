@@ -131,7 +131,7 @@ export default function Title({ route }) {
           <Text style={styles.trailersButtonText}>Watch Trailers</Text>
           <Image
             style={{ width: 18, height: 18, alignSelf: "center", tintColor: "white" }}
-            source={require("../assets/play-icon.png")}
+            source={require("../assets/play_icon.png")}
           />
         </Pressable>
     )
@@ -166,7 +166,7 @@ export default function Title({ route }) {
         <Text style={styles.trailersButtonText}>Share With Friends</Text>
         <Image
           style={{ width: 18, height: 18, alignSelf: "center", tintColor: "white" }}
-          source={require("../assets/share-icon.png")}
+          source={require("../assets/share_icon.png")}
         />
       </Pressable>
     )
