@@ -1,5 +1,5 @@
 import Title from "./pages/Title";
-import { SafeAreaView } from "react-native";
+import { SafeAreaView, Image } from "react-native";
 import TitlePreview from "./components/TitlePreview";
 import Discover from "./pages/Discover";
 import { createStackNavigator } from "@react-navigation/stack";
@@ -16,7 +16,7 @@ export default function App() {
   const WatchListStack = () => {
     return (
       <Stack.Navigator screenOptions={{headerShown: false}}>
-        <Stack.Screen name="WatchList" component={WatchList} />
+        <Stack.Screen name="WatchListPage" component={WatchList} />
         <Stack.Screen name="Title" component={Title} />
       </Stack.Navigator>
     )
@@ -25,20 +25,41 @@ export default function App() {
   const DiscoverStack = () => {
     return (
       <Stack.Navigator screenOptions={{ headerShown: false }}>
-        <Stack.Screen name="Discover" component={Discover} />
+        <Stack.Screen name="DiscoverPage" component={Discover} />
         <Stack.Screen name="Title" component={Title} />
       </Stack.Navigator>
     );
   };
 
   return (
-    <SafeAreaView style={{ flex: 1 }}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: '#2b2d30' }}>
       <NavigationContainer>
         <Tab.Navigator screenOptions={{
           headerShown: false,
+          tabBarActiveTintColor: '#B11515',
+          tabBarInactiveTintColor: '#CCCCCC',
+          tabBarStyle: { backgroundColor: '#2b2d30', borderTopWidth: 1},
         }}>
-          <Tab.Screen name="WatchListStack" component={WatchListStack} />
-          <Tab.Screen name="DiscoverStack" component={DiscoverStack} />
+          <Tab.Screen name="Watch List"
+                        component={WatchListStack}
+                        options={{
+                          tabBarIcon: ({ size, focused }) => (
+                            <Image
+                              source={require("./assets/home_icon.png")}
+                              style={{ width: size, height: size, resizeMode: "cover", tintColor: focused ? "#B11515" : "gray" }}
+                            />
+                          ),
+                        }} />
+          <Tab.Screen name="Discover"
+                      component={DiscoverStack}
+                      options={{
+                        tabBarIcon: ({ size, focused }) => (
+                          <Image
+                            source={require("./assets/discover_icon.png")}
+                            style={{ width: size, height: size, resizeMode: "cover", tintColor: focused ? "#B11515" : "gray" }}
+                          />
+                        ),
+                      }} />
         </Tab.Navigator>
       </NavigationContainer>
     </SafeAreaView>

@@ -10,7 +10,7 @@ export default function TitlePreview({ data, navigation }) {
         titleID: data.imdbID,
       })}>
       <View style={{ flex: 1 }}>
-        {data.Poster !== 'N/A' ? <Image source={{ uri: data.Poster }} style={{ height: 80, width: 70 }} /> : <Text>No image</Text>}
+        {data.Poster !== 'N/A' ? <Image source={{ uri: data.Poster }} style={{ height: 80, width: 70, borderRadius: 5 }} /> : <Text>No image</Text>}
       </View>
       <View style={{ flex: 3}}>
         <Text style={styles.previewText}>{data.Title}</Text>
@@ -38,7 +38,7 @@ const styles = StyleSheet.create({
   previewText: {
     color: "white",
     fontFamily: "Lato-Bold",
-    fontSize: 18,
+    fontSize: 19,
   },
   previewTextType: {
     color: "white",

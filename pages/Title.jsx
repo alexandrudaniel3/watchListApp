@@ -213,14 +213,14 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   imageContainer: {
-    height: 280,
-    width: "70%",
+    height: 320,
+    width: "60%",
     margin: "auto",
     alignSelf: "center",
   },
   image: {
     resizeMode: "cover",
-    height: 280,
+    height: 320,
     borderRadius: 15,
   },
   yearAndGenre: {

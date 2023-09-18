@@ -118,6 +118,9 @@ const styles = StyleSheet.create({
     backgroundColor: "#6c6f75",
     borderRadius: 25,
     paddingHorizontal: 10,
+    fontFamily: "Lato-Bold",
+    fontSize: 16,
+    color: "white",
   },
   searchBarButton: {
     width: 40,
