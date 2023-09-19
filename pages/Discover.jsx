@@ -20,6 +20,7 @@ const SearchBar = ({ setSearchQuery }) => {
                  onChangeText={onChangeSearch}
                  value={input}
                  placeholderTextColor="#2b2d30"
+                 onSubmitEditing={onSearchButtonPress}
       />
       <Pressable
         onPress={onSearchButtonPress}>

@@ -34,6 +34,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.75,
     shadowRadius: 3,
     alignItems: "center",
+    elevation: 12
   },
   previewText: {
     color: "white",

@@ -69,7 +69,7 @@ export default function WatchList({ navigation }) {
 
     if (displayMode === 'list') {
       return (
-        <View>
+        <View style={{elevation: 10}}>
           <Text style={styles.categoryTitle}>Need To Watch:</Text>
           {toWatchList.map((title, index) => (
             <SavedTitle data={title.data} id={title.id} key={index} navigation={navigation} displayMode={displayMode}/>
@@ -123,7 +123,7 @@ export default function WatchList({ navigation }) {
     <View style={styles.page}>
       <View style={styles.header}>
         <Text style={styles.headerText}>
-          Watch List
+          W<Text style={styles.headerSmallerText}>atch</Text>B<Text style={styles.headerSmallerText}>ucket</Text>
         </Text>
         <Pressable
           style={styles.displayButton}
@@ -141,6 +141,7 @@ export default function WatchList({ navigation }) {
         </Pressable>
       </View>
       <ScrollView>
+        {titlesData.length === 0 ? <Text style={styles.noTitles}>You haven't added any titles to your watch list yet! </Text> : null}
         <ToWatchList />
         <WatchedList />
       </ScrollView>
@@ -162,7 +163,6 @@ const styles = StyleSheet.create({
   headerText: {
     flex: 1,
     alignSelf: "flex-start",
-    fontWeight: "bold",
     fontSize: 55,
     color: "white",
     fontFamily: "BebasNeue-Regular",
@@ -170,6 +170,9 @@ const styles = StyleSheet.create({
     textShadowOffset: { width: 4, height: 4 },
     textShadowRadius: 0,
     textAlign: "left",
+  },
+  headerSmallerText: {
+    fontSize: 45,
   },
   displayButton: {
     margin: 5,
@@ -192,5 +195,12 @@ const styles = StyleSheet.create({
     color: "white",
     marginLeft: 20,
     marginVertical: 5,
+  },
+  noTitles: {
+    fontFamily: "Lato-Bold",
+    fontSize: 20,
+    color: "white",
+    margin: 10,
+    textAlign: "center",
   },
 });

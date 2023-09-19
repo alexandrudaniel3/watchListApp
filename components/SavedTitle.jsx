@@ -33,6 +33,7 @@ const styles = StyleSheet.create({
     shadowRadius: 3,
     alignItems: "center",
     alignSelf: "center",
+    elevation: 12,
   },
   titleContainerlist: {
     flexDirection: "row",
@@ -45,7 +46,8 @@ const styles = StyleSheet.create({
     shadowOffset: {width: 5, height:5},
     shadowOpacity: 0.75,
     shadowRadius: 3,
-    alignItems: 'center'
+    alignItems: 'center',
+    elevation: 12
   },
   titleTextContainergrid: {
     display: "none",

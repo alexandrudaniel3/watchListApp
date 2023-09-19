@@ -138,7 +138,7 @@ export default function Title({ route }) {
   }
 
   const Rating = () => {
-    if (!titleData.Ratings) {
+    if (titleData.Ratings?.length === 0) {
       return;
     }
 
@@ -160,7 +160,7 @@ export default function Title({ route }) {
       <Pressable style={styles.trailersButton}
         onPress={async () => {
         await Share.share({
-          message: `Check out this ${titleData.Type} called '${titleData.Title}' I found on WatchListApp! https://www.imdb.com/title/${titleID}/`,
+          message: `Check out this ${titleData.Type} called '${titleData.Title}' I found on WatchListApp! http://alexandrudaniel3.github.io/watch-list-online/#/${titleID}/`,
         })
       }}>
         <Text style={styles.trailersButtonText}>Share With Friends</Text>
@@ -177,7 +177,7 @@ export default function Title({ route }) {
       <ScrollView style={styles.page}>
         <Text style={styles.title}>{titleData.Title?.toUpperCase()}</Text>
         <View style={styles.imageContainer}>
-          <Image style={styles.image} source={{ uri: titleData.Poster }} />
+          {titleData.Poster !== 'N/A' ? <Image style={styles.image} source={{ uri: titleData.Poster }} /> : <Text style={styles.plot}>No image available for this title.</Text>}
         </View>
         <Text style={styles.yearAndGenre}>{titleData.Released} – {titleData.Genre}</Text>
         <Rating />
@@ -202,8 +202,7 @@ const styles = StyleSheet.create({
   },
   title: {
     alignSelf: "center",
-    fontWeight: "bold",
-    fontSize: 40,
+    fontSize: 50,
     color: "white",
     fontFamily: "BebasNeue-Regular",
     margin: 5,
