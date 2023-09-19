@@ -1,4 +1,4 @@
-package com.watchlistapp;
+package com.watchbucket;
 
 import com.facebook.react.ReactActivity;
 import com.facebook.react.ReactActivityDelegate;

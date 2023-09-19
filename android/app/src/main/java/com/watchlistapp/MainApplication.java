@@ -1,4 +1,4 @@
-package com.watchlistapp;
+package com.watchbucket;
 
 import android.app.Application;
 import com.facebook.react.PackageList;
