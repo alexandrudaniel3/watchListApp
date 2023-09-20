@@ -6,13 +6,32 @@ import SavedTitle from "../components/SavedTitle";
 import { useIsFocused } from "@react-navigation/native";
 import { SimpleGrid } from "react-native-super-grid";
 
+const getDisplayMode = async () => {
+  const mode = await AsyncStorage.getItem('display');
+  if (!mode) {
+    await saveDisplayMode('list');
+    return 'list';
+  } else {
+    return mode;
+  }
+}
+
+const saveDisplayMode = async (mode) => {
+  await AsyncStorage.setItem('display', mode);
+}
+
 const getStoredTitles = async (setTitlesData) => {
   let titlesIDs = [];
   let titlesData = [];
 
   try {
     titlesIDs = await AsyncStorage.getAllKeys();
+
     for (let titleID of titlesIDs) {
+      if (titleID === 'display') {
+        continue;
+      }
+
       let titleData = await AsyncStorage.getItem(titleID);
       titlesData.push(
         {
@@ -49,6 +68,14 @@ export default function WatchList({ navigation }) {
 
   useEffect(() => {
     getStoredTitles(setTitlesData);
+
+    const loadDisplayMode = async () => {
+      const mode = await getDisplayMode();
+      setDisplayMode(mode);
+    }
+
+    loadDisplayMode();
+
   }, []);
 
   useEffect(() => {
@@ -56,6 +83,7 @@ export default function WatchList({ navigation }) {
       getStoredTitles(setTitlesData);
     }
   }, [isFocused]);
+
   const ToWatchList = () => {
     if (titlesData.length === 0) {
       return;
@@ -130,8 +158,10 @@ export default function WatchList({ navigation }) {
           onPress={() => {
             if (displayMode === "list") {
               setDisplayMode("grid");
+              saveDisplayMode("grid");
             } else {
               setDisplayMode("list");
+              saveDisplayMode("list");
             }
           }}
         >
